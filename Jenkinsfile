@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sharvari134/one-click.git'
+                git branch: 'main', url: 'https://github.com/Jogeswar98/oneclick_setup.git'
             }
         }
         stage('Terraform init') {
