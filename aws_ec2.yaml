@@ -3,7 +3,7 @@ regions:
   - ap-northeast-3
 filters:
   "tag:Name":
-    - "aerospike-server"
+    - "Aerospike-server"
 compose:
   ansible_host: private_ip_address
 strict: False
