@@ -1,0 +1,62 @@
+---
+- name: Debug Aerospike Installation
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update the apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install required dependencies
+      apt:
+        name:
+          - wget
+          - lsb-release
+        state: present
+
+    - name: Download Aerospike package
+      shell: |
+        wget -O /tmp/aerospike.tgz https://download.aerospike.com/artifacts/aerospike-server-community/8.0.0/aerospike-server-community_8.0.0.0-rc3_tools-11.1.1_ubuntu24.04_x86_64.tgz
+      args:
+        creates: /tmp/aerospike.tgz
+
+    - name: Ensure Aerospike extraction directory exists
+      file:
+        path: /tmp/aerospike
+        state: directory
+
+    - name: Extract Aerospike package
+      unarchive:
+        src: /tmp/aerospike.tgz
+        dest: /tmp/aerospike
+        remote_src: yes
+
+    - name: List contents of the extracted directory
+      shell: ls -l /tmp/aerospike
+      register: extracted_files
+
+    - name: Debug extracted files
+      debug:
+        msg: "Extracted files: {{ extracted_files.stdout }}"
+
+    - name: Check for asinstall script
+      stat:
+        path: /tmp/aerospike/aerospike-server-community_8.0.0.0-rc3_tools-11.1.1_ubuntu24.04_x86_64/asinstall
+      register: asinstall_stat
+
+    - name: Fail if asinstall script is missing
+      fail:
+        msg: "The asinstall script is missing in the extracted Aerospike directory."
+      when: not asinstall_stat.stat.exists
+
+    - name: Install Aerospike server
+      shell: |
+        cd /tmp/aerospike/aerospike-server-community_8.0.0.0-rc3_tools-11.1.1_ubuntu24.04_x86_64 && sudo ./asinstall
+      args:
+        chdir: /tmp/aerospike/aerospike-server-community_8.0.0.0-rc3_tools-11.1.1_ubuntu24.04_x86_64
+
+    - name: Start Aerospike service
+      systemd:
+        name: aerospike
+        state: started
+        enabled: yes
