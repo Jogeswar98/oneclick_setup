@@ -1,8 +1,9 @@
 ---
-- name: Install Aerospike on Ubuntu 22.04
-  hosts: localhost
-  become: true
+- name: Install Java and Aerospike on Ubuntu
+  hosts: all
+  become: yes
   tasks:
+  
     - name: Add Aerospike repository key
       apt_key:
         url: https://download.aerospike.com/debian/aerospike-key.asc
@@ -37,3 +38,4 @@
     - name: Output Aerospike installation status
       debug:
         msg: "Aerospike service is installed and running successfully."
+    
