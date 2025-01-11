@@ -8,6 +8,9 @@
       apt_key:
         url: https://download.aerospike.com/debian/aerospike-key.asc
         state: present
+        timeout: 60
+      register: gpg_key_result
+      failed_when: gpg_key_result.failed and "'Connection failure' in gpg_key_result.msg"
 
     - name: Add Aerospike repository
       apt_repository:
